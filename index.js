@@ -12,50 +12,34 @@ app.use(express.urlencoded());
 app.use(express.static('assets'));
 app.set('view engine','ejs');
 app.set('views',path.join(__dirname,'view'));
-
-    var contactlist=[
-        {
-            name:"dhanu",
-            Moblie_no:"1111111"
-        },
-        {
-            name:"Radhe",
-            Moblie_no:"2222222222"
-        },
-        {
-            name:"Shyam",
-            Moblie_no:"99999999"
-        }
-    ]
+  let createContact=async function(req,res){
+    // contactlist.push(req.body);
+       try{ 
+        let contact= await Contact.create({ name:req.body.name,Mobile_no:req.body.Mobile_no});
+        if(req.xhr){
+            return res.status(200).json({
+                data:contact
+            });
+            console.log(contact);  
+        } 
+      }catch(err){
+          console.log("Error",err);
+          return ;
+      }
+  } 
     app.get('/',function(req,res){
         console.log(__dirname);
          Contact.find({},function(err,Contactdata){
              if(err){
-                 console.log("WTF");
                  return ;
              }
-            //  console.log(Contactdata);
              return res.render('home',{
                 title:'My Contact List',
                 contact_list:Contactdata
             });
          });
-        // res.send("<h1>Ohh  Yes</h1>");
     }); 
-    app.post('/createContact',function(req,res){
-    // contactlist.push(req.body);
-    Contact.create({
-        name:req.body.name,
-        Moblie_no:req.body.Moblie_no
-    },function(err,ContactData){
-        if(err){
-            console.log("WTF");
-        }
-        console.log(ContactData);
-    });
-
-        return res.redirect('/');
-    });
+    app.post('/createContact',createContact);
    app.get('/deleteContact',function(req,res){
     //    console.log(req.query);
        let id=req.query.id;
@@ -68,7 +52,8 @@ app.set('views',path.join(__dirname,'view'));
    });
    app.get('/searchContact',function(req,res){
          console.log(req.query.tosearch);
-         Contact.find({name:req.query.tosearch},function(err,Contactdata){
+         let tosearch= new RegExp(req.query.tosearch, 'i');
+         Contact.find({name:tosearch},function(err,Contactdata){
              if(err){
                  console.log("Not found");
                  return ;

@@ -6,11 +6,10 @@ var ContactSchema =new mongoose.Schema({
         type:String,
         required:true
     },
-    Moblie_no:{
+    Mobile_no:{
         type:String,
         required:true
     }
-
 });
 // for  making model of a schema 
 const Contact=mongoose.model('ContactModel',ContactSchema);
